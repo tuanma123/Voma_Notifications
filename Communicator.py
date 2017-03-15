@@ -29,7 +29,7 @@ Sends an email message.
 """
 
 
-def send_email(to_address, from_address, subject,body):
+def send_email(to_address, from_address, from_adress_password, subject,body):
     msg = MIMEMultipart()
     msg['From'] = from_address
     msg['To'] = to_address
@@ -40,7 +40,8 @@ def send_email(to_address, from_address, subject,body):
 
     server = smtplib.SMTP('smtp.gmail.com', 587)
     server.starttls()
-    server.login(from_address, "secretsanta")
+    server.login(from_address, from_adress_password)
     text = msg.as_string()
     server.sendmail(from_address, to_address, text)
     server.quit()
+    print("message sent")
