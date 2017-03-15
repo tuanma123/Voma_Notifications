@@ -1,8 +1,16 @@
-import random
 from twilio.rest import TwilioRestClient
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+
+
+"""
+Sends a text message to a phone using the Twilio API.
+
+@:param to_number: The number receiving the message.
+@:param from_number: The number sending the message.
+@:param body: The message of the text
+"""
 
 
 def send_text(to_number,from_number,body):
@@ -12,12 +20,19 @@ def send_text(to_number,from_number,body):
     client.messages.create(to=to_number, from_=from_number, body=body)
 
 
-def send_email(to_address,subject,body):
-    fromaddr = "secretsantabotbchacks@gmail.com"
-    toaddr = to_address
+"""
+Sends an email message.
+
+@:param to_address: The recipient email address.
+@:param subject: The subject header of the email.
+@:param body: The body of the email.
+"""
+
+
+def send_email(to_address, from_address, subject,body):
     msg = MIMEMultipart()
-    msg['From'] = fromaddr
-    msg['To'] = toaddr
+    msg['From'] = from_address
+    msg['To'] = to_address
     msg['Subject'] = subject
 
     body = body
@@ -25,9 +40,7 @@ def send_email(to_address,subject,body):
 
     server = smtplib.SMTP('smtp.gmail.com', 587)
     server.starttls()
-    server.login(fromaddr, "secretsanta")
+    server.login(from_address, "secretsanta")
     text = msg.as_string()
-    server.sendmail(fromaddr, toaddr, text)
+    server.sendmail(from_address, to_address, text)
     server.quit()
-
-send_text("14259705093","14259705093","testing")
