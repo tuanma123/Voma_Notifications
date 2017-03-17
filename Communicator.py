@@ -1,8 +1,8 @@
-from twilio.rest import TwilioRestClient
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
+from twilio.rest import TwilioRestClient
 
 """
 Sends a text message to a phone using the Twilio API.
@@ -11,8 +11,6 @@ Sends a text message to a phone using the Twilio API.
 @:param from_number: The number sending the message.
 @:param body: The message of the text
 """
-
-
 def send_text(to_number,from_number,body):
     twilio_account_sid = "AC99faeab4ac921d22d1ae19210d5853b2"
     twilio_auth_token = "4db2c7713c5b95af6c6842c4a7e698f5"

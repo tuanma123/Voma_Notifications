@@ -1,4 +1,4 @@
-# Voma Notifications 
+# Voma Notifications
 
 ## Description:
 The notification and reminder system created for our townhouse roommates. Implemented in Python. 
