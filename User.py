@@ -1,4 +1,4 @@
-class User(object):
+class User():
 
     def __init__(self,first_name, last_name, email, phone_number, permissions):
         self.first_name = first_name
@@ -27,5 +27,4 @@ class User(object):
         return self.permissions[2] == 1
 
     def __str__(self):
-        return self.first_name + ' ' + self.last_name + ' ' + self.email + ' ' + self.phone_number + ' ' \
-               + self.permissions
+        return self.first_name + ' ' + self.last_name + ' ' + self.email + ' ' + self.phone_number + ' ' + self.permissions
