@@ -2,9 +2,21 @@ import datetime
 import time
 
 import Communicator
+import Database
 
 mailer_bot = "spamslamjamuw@gmail.com"
 mailer_bot_password = "pleasehackme"
+
+
+def send_email_to_users(subject, body):
+    user_list = Database.get_user_list()
+    for user in user_list:
+        Communicator.send_email(user.email, mailer_bot, mailer_bot_password, subject, body)
+
+def send_text_to_users(body):
+    user_list = Database.get_user_list()
+    for user in user_list:
+        Communicator.send_text(user.phone_number,"", body)
 
 """
 Sends emails to a mailing list every month.
