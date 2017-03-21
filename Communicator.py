@@ -2,7 +2,7 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from twilio.rest import TwilioRestClient
-
+# Communicator is able to send messages via Email or Text
 
 class Communicator():
     def __init__(self, twilio_sid, twilio_auth_token, twilio_number, email_address, email_password):
