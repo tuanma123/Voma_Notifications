@@ -27,4 +27,5 @@ class User():
         return self.permissions[2] == 1
 
     def __str__(self):
-        return self.first_name + ' ' + self.last_name + ' ' + self.email + ' ' + self.phone_number + ' ' + self.permissions
+        return self.first_name + ' ' + self.last_name + ' ' + self.email + ' ' \
+               + self.phone_number + ' ' + self.permissions

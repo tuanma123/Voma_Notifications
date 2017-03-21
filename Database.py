@@ -60,8 +60,9 @@ class Database():
     def __str__(self):
         header = "First Name        Last Name       Email                       Phone Number        " \
                  "Permissions(Email-Phone-Announcement-Rent-Admin)\n"
-        output = header + '_' * len(header) +'\n'
+        output = header + '_' * (len(header) - 1) +'\n'
         for user in self.user_list:
-            output += '{:<18}{:<16}{:<28}{:<20}{:<5}'.format(user.first_name,user.last_name,user.email,user.phone_number,user.permissions)
+            output += '{:<18}{:<16}{:<28}{:<20}{:<5}'.format(user.first_name,user.last_name,user.email
+                                                            ,user.phone_number,user.permissions)
             output += '\n'
         return output

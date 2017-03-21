@@ -48,7 +48,7 @@ class Communicator():
         server.quit()
         print("message sent")
 
-    # Send a batch of emails given a list.
+    # Send a batch of emails given a list of addresses.
     def send_batch_email(self, email_list, subject, body):
         for email in email_list:
             self.send_email(email, subject, body)
