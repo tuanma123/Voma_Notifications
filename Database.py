@@ -38,7 +38,7 @@ class Database():
     # Print the current list of users.
     def print_user_list(self):
         for user in self.user_list:
-            print(user)
+            print(str(user))
 
     # Returns a list of user emails
     def get_email_list(self):
@@ -53,7 +53,7 @@ class Database():
         msg_list = []
         for user in self.user_list:
             if user.permissions[1] == '1':
-                msg_list.append(user)
+                msg_list.append(user.phone_number)
         return msg_list
 
     # Returns a String representing the data in a readable format.
