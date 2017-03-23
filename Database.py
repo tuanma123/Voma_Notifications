@@ -1,5 +1,3 @@
-import User as User
-
 import _sqlite3
 
 connection = _sqlite3.connect("Master.db")
@@ -64,7 +62,7 @@ def get_user(first_name, last_name):
     """
     cursor.execute("SELECT * FROM users WHERE firstName=? AND lastName=?", (first_name, last_name))
     for row in cursor.fetchall():
-        print str(row)
+        print(str(row))
 
 
 def clear_table():

@@ -10,7 +10,7 @@ def sms():
     list = [1,2,3]
     resp = twiml.Response()
     resp.message("YOU BITCH ASS MOFO")
-    print body
+    print(body)
     if body == "add 4" :
         list.append(4)
 
