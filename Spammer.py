@@ -1,65 +1,58 @@
 import smtplib
-import time
+import datetime
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-
 from twilio.rest import TwilioRestClient
-
 import Database
+import Timing
 
-mailer_bot = "spamslamjamuw@gmail.com"
-mailer_bot_password = "pleasehackme"
-twilio_auth_token = "ACd2c7cb9040bb920dbb196efbd6af7df7"
-twilio_sid = "5efc50b214eb7a96361f046f0b4e9b8f"
-twilio_number = 2069224468
-
-
-def sleep_every_x_seconds(interval):
-    time.sleep(interval)
+default_mailer_bot = "spamslamjamuw@gmail.com"
+default_mailer_bot_password = "pleasehackme"
+default_twilio_auth_token = "ACd2c7cb9040bb920dbb196efbd6af7df7"
+default_twilio_sid = "5efc50b214eb7a96361f046f0b4e9b8f"
+default_twilio_auth_tokentwilio_number = 2069224468
+particles = (",", ".", "?", "!",)
 
 
-def sleep_every_x_minutes(interval):
-    sleep_every_x_seconds(interval * 60)
+def parse_message(file_path):
+    text = open(file_path, "r")
+    line_list = []
+    for line in text:
+        line = line.replace("findStr", "replaceStr")
+        line_list.append(line.strip().split(" "))
+    return line_list
 
 
-def sleep_every_x_hours(interval):
-    sleep_every_x_minutes(interval * 60)
-
-
-def sleep_every_x_days(interval):
-    sleep_every_x_hours(interval * 24)
-
-
-def sleep_every_x_weeks(interval):
-    sleep_every_x_days(interval * 7)
-
-
-def is_leap_year(year):
-    return (year % 4 == 0 and year % 100 != 0) or (year % 400 == 0)
-
-
-def end_of_month(month, day, year):
-    if month == 1 or month == 3 or month == 5 or month == 7 or month == 8 or month == 10 or month == 12:
-        return day == 31
-    elif month == 2:
-        if is_leap_year(year):
-            return day == 29
+def construct_token_string(file_string_list, token_map):
+    result = ""
+    # Go through the entire list of sentences
+    for string_list in file_string_list:
+        # If the list is empty, its just a line feed
+        if string_list == ['']:
+            result += '\n'
         else:
-            return day == 28
-    else:
-        return day == 30
+            # Go through every word of a non empty sentence
+            for string in string_list:
+                # If the word is a token as defined by the opening bracket.
+                if string[0] == "[":
+                    # Remove all grammer particles such as periods and commas.
+                    string_remove = string
+                    for particle in particles:
+                        string_remove = string_remove.replace(particle, "")
+                    # Check if the token is in the token map.
+                    # If so replace it with the matching value from the token map.
+                    if string_remove in token_map:
+                        string = string.replace(string_remove, token_map[string_remove])
+                        result += string + " "
+                    else:
+                        result += string + " "
+                else:
+                    result += string + " "
+    return result
 
 
 class Spammer():
     def __init__(self, twilio_sid, twilio_auth_token, twilio_number, email_address, email_password):
-        """
-
-        :param twilio_sid:
-        :param twilio_auth_token:
-        :param twilio_number:
-        :param email_address:
-        :param email_password:
-        """
         self.twilio_sid = twilio_sid
         self.twilio_auth_token = twilio_auth_token
         self.twilio_number = twilio_number
@@ -100,24 +93,45 @@ class Spammer():
         server.quit()
         print("message sent")
 
-    # Send a batch of emails given a list of addresses.
-    def send_batch_email(self, email_list, subject, body):
-        for email in email_list:
-            self.send_email(email, subject, body)
+    def send_email_to_users(self, subject, body):
+        user_list = Database.get_user_list()
+        for user in user_list:
+            pass
 
-    # Send a batch of messages given a list of phone numbers.
-    def send_batch_message(self, msg_list, body):
-        for phone_number in msg_list:
+    def send_text_to_users(self, body):
+        for phone_number in Database.get_phone_list():
             self.send_text(phone_number, body)
 
-    # Implement this
-    def send_email_to_users(subject, body):
-        user_list = Database.get_user_list()
-        for user in user_list:
-            pass
+    def send_messages_based_on_preferences(self, user, message):
+        if user.permissions[0] == 1:
+            self.send_email(user.email,"AUTOMATED MESSAGE", message)
+        if user.permissions[1] == 1:
+            self.send_text(user.phone_number, message)
 
-    # Implement this
-    def send_text_to_users(body):
-        user_list = Database.get_user_list()
-        for user in user_list:
-            pass
+    def automated_messages(self):
+        now = datetime.datetime.now()
+        days_left = Timing.days_left_in_month(now.month, now.date(), Timing.is_leap_year(now.year))
+        if days_left == 7:
+            for user in Database.get_user_list():
+                if user.rent[now.month-1] == 0:
+                    #NOTE: IMPLEMENT AN UTILITY VARIABLE
+                    message_map = {"[NAME]" : user.first_name + user.last_name, "[PRICE]" : "$600.00"}
+                    message_list = parse_message("/home/tuna/PycharmProjects/Voma_Notifications/Messages/7DayWarning.mv")
+                    message = construct_token_string(message_list, message_map)
+                    self.send_messages_based_on_preferences(user, message)
+        elif days_left == 4:
+            for user in Database.get_user_list():
+                if user.rent[now.month-1] == 0:
+                    #NOTE: IMPLEMENT AN UTILITY VARIABLE
+                    message_map = {"[NAME]" : user.first_name + user.last_name, "[PRICE]" : "$600.00"}
+                    message_list = parse_message("/home/tuna/PycharmProjects/Voma_Notifications/Messages/4DayWarning.mv")
+                    message = construct_token_string(message_list, message_map)
+                    self.send_messages_based_on_preferences(user, message)
+        elif days_left == 2:
+            for user in Database.get_user_list():
+                if user.rent[now.month-1] == 0:
+                    #NOTE: IMPLEMENT AN UTILITY VARIABLE
+                    message_map = {"[NAME]" : user.first_name + user.last_name, "[PRICE]" : "$600.00"}
+                    message_list = parse_message("/home/tuna/PycharmProjects/Voma_Notifications/Messages/2DayWarning.mv")
+                    message = construct_token_string(message_list, message_map)
+                    self.send_messages_based_on_preferences(user, message)

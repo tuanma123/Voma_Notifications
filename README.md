@@ -11,5 +11,13 @@ options.
 2. Sending out general notification messages. 
 3. Recognizing people who have already paid their dues, and not spamming them.
 
+## Commands:
+### All Users:
+
+### Administrators:
+shutdown: Remotely shutdowns the entire server and serivce.
+
+nuke: Remotely shutsdown the entire server and service and deletes ALL of our records.
+
 ## Credit:
 Created by Tuan Ma and Tony Vo.
