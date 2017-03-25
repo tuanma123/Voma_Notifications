@@ -61,7 +61,8 @@ def get_user(first_name, last_name):
     :param last_name: Last name of the search query.
     :return: Void.
     """
-    cursor.execute("SELECT * FROM users WHERE firstName=? AND lastName=?", (first_name, last_name))
+    cursor.execute(
+        "SELECT * FROM users WHERE firstName=? AND lastName=?", (first_name, last_name))
     for row in cursor.fetchall():
         print(str(row))
 
@@ -88,7 +89,6 @@ def get_email_list():
     for row in cursor.fetchall():
         email_list.append(row[2])
     return get_user_list()
-
 
 def get_phone_list():
     """ Gets a  phone mailing list for all of our users.
@@ -144,25 +144,48 @@ def update_user(old_user, new_user):
                                      new_user.permissions, new_user.rent, old_user.first_name, old_user.last_name))
     connection.commit()
 
+
 def verify_phone_number(phone_number):
-    cursor.execute("SELECT * FROM users where phoneNumber=?", (phone_number))
+    """ Verify that  user is in the database based on phone number
+
+    :param phone_number: The user's phone number
+    :return: True or false depending if user is in the database or not.
+    """
+    cursor.execute("SELECT * FROM users WHERE phoneNumber=?", (phone_number,))
     result = cursor.fetchall()
     return len(result) > 0
 
 
 def verify_email(email):
-    cursor.execute("SELECT * FROM users WHERE email=?", email)
+    """ Verify that  user is in the database based on email
+
+        :param phone_number: The user's email address.
+        :return: True or false depending if user is in the database or not.
+        """
+
+    cursor.execute("SELECT * FROM users WHERE email=?", (email,))
     result = cursor.fetchall()
     return len(result) > 0
 
 
-def is_admin(email="", phone_number=""):
-    if not email == "":
-        cursor.execute("SELECT * FROM users WHERE email=?", email)
-        return cursor.fetchall()[0][2] == 1
+def is_admin_email(email):
+    cursor.execute("SELECT * FROM users WHERE email=?", (email,))
+    check = cursor.fetchall()
+    if check:
+        permissions = check[0][4]
+        return permissions[4] == "1"
     else:
-        cursor.execute("SELECT * FROM users WHERE phoneNumber=?", (phone_number))
-        return cursor.fetchall()[0][3] == 1
+        return False
+
+
+def is_admin_phone(phone_number):
+    cursor.execute("SELECT * FROM users WHERE phoneNumber=?", (phone_number,))
+    check = cursor.fetchall()
+    if check:
+        permissions = check[0][4]
+        return permissions[4] == "1"
+    else:
+        return False
 
 
 def print_database_by_row():
@@ -173,6 +196,82 @@ def print_database_by_row():
     cursor.execute("SELECT * FROM users")
     for row in cursor.fetchall():
         print (str(row))
+
+
+def update_email(old_email, new_email):
+    cursor.execute("UPDATE users SET email=? WHERE email=?", (new_email, old_email))
+
+
+def update_phone_number(old_number, new_number):
+    cursor.execute("UPDATE users SET phoneNumber=? WHERE phoneNumber=?", (new_number, old_number))
+
+
+def update_rent_email(email_address):
+    """ Updates the persons rent by one.
+
+    :param email_address: The user's email address.
+    :return: Void
+    """
+    cursor.execute("SELECT * FROM users WHERE email=?", (email_address,))
+    current_rent = (cursor.fetchone()[5])
+    current_rent_list = list(current_rent)
+    for x in current_rent_list :
+        if x == "0":
+            pos_x = current_rent.index(x)
+            current_rent_list[pos_x] = "1"
+            break
+    new_rent = ''.join(current_rent_list)
+    cursor.execute("UPDATE users SET rent=? WHERE rent=? AND email=?", (new_rent, current_rent,email_address))
+
+def update_rent_phone(phone_number) :
+    """ Updates the persons rent by one.
+
+    :param email_address: The user's email address.
+    :return: Void
+    """
+    cursor.execute("SELECT * FROM users WHERE phoneNumber=?", (phone_number,))
+    current_rent = (cursor.fetchone()[5])
+    current_rent_list = list(current_rent)
+    for x in current_rent_list:
+        if x == "0":
+            pos_x = current_rent.index(x)
+            current_rent_list[pos_x] = "1"
+            break
+    new_rent = ''.join(current_rent_list)
+    cursor.execute("UPDATE users SET rent=? WHERE rent=? AND phoneNumber=?", (new_rent, current_rent, phone_number))
+
+
+def get_name_phone(phone_number) :
+    cursor.execute("SELECT * FROM users WHERE phoneNumber=?",(phone_number,))
+    check = cursor.fetchone()
+    if check:
+        first_name = check[0]
+        last_name = check[1]
+        return first_name + " " + last_name
+    else:
+        return None
+
+def update_permissions_email(phone_number):
+    cursor.execute("SELECT * FROM users WHERE phoneNumber=?", (phone_number,))
+    check = cursor.fetchall()
+    if check:
+        permissions = check[0][4]
+        indexing = list(permissions)
+        indexing[0] = "1"
+        new_permissions = ''.join(indexing)
+        cursor.execute("UPDATE users SET permissions=? WHERE permissions=? AND phoneNumber=?",
+                       (new_permissions, permissions, phone_number))
+
+def update_permissions_phone(phone_number):
+    cursor.execute("SELECT * FROM users WHERE phoneNumber=?", (phone_number,))
+    check = cursor.fetchall()
+    if check:
+        permissions = check[0][4]
+        indexing = list(permissions)
+        indexing[1] = 1
+        new_permissions = ''.join(indexing)
+        cursor.execute("UPDATE users SET permissions=? WHERE permissions=? AND phoneNumber=?",
+                       (new_permissions, permissions, phone_number))
 
 
 def close_sql():
