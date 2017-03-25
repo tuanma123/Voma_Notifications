@@ -6,12 +6,7 @@ from twilio.rest import TwilioRestClient
 import Database
 import Timing
 
-default_mailer_bot = "spamslamjamuw@gmail.com"
-default_mailer_bot_password = "pleasehackme"
-default_twilio_auth_token = "ACd2c7cb9040bb920dbb196efbd6af7df7"
-default_twilio_sid = "5efc50b214eb7a96361f046f0b4e9b8f"
-default_twilio_auth_tokentwilio_number = 2069224468
-particles = (",", ".", "?", "!",)
+particles = (",", ".", "?", "!")
 
 
 def parse_message(file_path):
@@ -103,35 +98,42 @@ class Spammer():
             self.send_text(phone_number, body)
 
     def send_messages_based_on_preferences(self, user, message):
-        if user.permissions[0] == 1:
+        if user.permissions[0] == "1":
             self.send_email(user.email,"AUTOMATED MESSAGE", message)
-        if user.permissions[1] == 1:
+        if user.permissions[1] == "1":
             self.send_text(user.phone_number, message)
 
-    def automated_messages(self):
+
+    def automated_messages(self, hour, minute):
+        """
+
+        :param time_of_day: Based on 24 hour clock. Tuple: ( Hour , Minute )
+        :return:
+        """
         now = datetime.datetime.now()
-        days_left = Timing.days_left_in_month(now.month, now.date(), Timing.is_leap_year(now.year))
-        if days_left == 7:
+        days_left = Timing.days_left_in_month(now.month, now.day, Timing.is_leap_year(now.year))
+        if days_left == 7 and now.hour == hour and now.minute == minute:
             for user in Database.get_user_list():
-                if user.rent[now.month-1] == 0:
+                if user.rent[now.month-1] == "0":
                     #NOTE: IMPLEMENT AN UTILITY VARIABLE
-                    message_map = {"[NAME]" : user.first_name + user.last_name, "[PRICE]" : "$600.00"}
-                    message_list = parse_message("/home/tuna/PycharmProjects/Voma_Notifications/Messages/7DayWarning.mv")
+                    message_map = {"[NAME]" : user.first_name + " " + user.last_name, "[PRICE]" : "$600.00"}
+                    message_list = parse_message("/media/tonyvo/VO/Programming/git-repos/Voma_Notifications/Messages/7DayWarning.mv")
                     message = construct_token_string(message_list, message_map)
                     self.send_messages_based_on_preferences(user, message)
-        elif days_left == 4:
+        elif days_left == 4 and now.hour == hour and now.minute == minute:
             for user in Database.get_user_list():
                 if user.rent[now.month-1] == 0:
                     #NOTE: IMPLEMENT AN UTILITY VARIABLE
                     message_map = {"[NAME]" : user.first_name + user.last_name, "[PRICE]" : "$600.00"}
-                    message_list = parse_message("/home/tuna/PycharmProjects/Voma_Notifications/Messages/4DayWarning.mv")
+                    message_list = parse_message("/media/tonyvo/VO/Programming/git-repos/Voma_Notifications/Messages/4DayWarning.mv")
                     message = construct_token_string(message_list, message_map)
                     self.send_messages_based_on_preferences(user, message)
-        elif days_left == 2:
+
+        elif days_left == 2 and now.hour== hour and now.minute == minute:
             for user in Database.get_user_list():
                 if user.rent[now.month-1] == 0:
                     #NOTE: IMPLEMENT AN UTILITY VARIABLE
                     message_map = {"[NAME]" : user.first_name + user.last_name, "[PRICE]" : "$600.00"}
-                    message_list = parse_message("/home/tuna/PycharmProjects/Voma_Notifications/Messages/2DayWarning.mv")
+                    message_list = parse_message("/media/tonyvo/VO/Programming/git-repos/Voma_Notifications/Messages/2DayWarning.mv")
                     message = construct_token_string(message_list, message_map)
                     self.send_messages_based_on_preferences(user, message)

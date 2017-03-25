@@ -11,7 +11,7 @@ def create_table ():
 
     :return: Void.
     """
-    cursor.execute("CREATE TABLE IF NOT EXISTS users(firstName TEXT, lastName TEXT, email TEXT, phoneNumber INT, "
+    cursor.execute("CREATE TABLE IF NOT EXISTS users(firstName TEXT, lastName TEXT, email TEXT, phoneNumber TEXT, "
                    "permissions TEXT, rent TEXT)")
 
 
@@ -143,6 +143,26 @@ def update_user(old_user, new_user):
                    "AND lastName=?",(new_user.first_name, new_user.last_name, new_user.email, new_user.phone_number,
                                      new_user.permissions, new_user.rent, old_user.first_name, old_user.last_name))
     connection.commit()
+
+def verify_phone_number(phone_number):
+    cursor.execute("SELECT * FROM users where phoneNumber=?", (phone_number))
+    result = cursor.fetchall()
+    return len(result) > 0
+
+
+def verify_email(email):
+    cursor.execute("SELECT * FROM users WHERE email=?", email)
+    result = cursor.fetchall()
+    return len(result) > 0
+
+
+def is_admin(email="", phone_number=""):
+    if not email == "":
+        cursor.execute("SELECT * FROM users WHERE email=?", email)
+        return cursor.fetchall()[0][2] == 1
+    else:
+        cursor.execute("SELECT * FROM users WHERE phoneNumber=?", (phone_number))
+        return cursor.fetchall()[0][3] == 1
 
 
 def print_database_by_row():

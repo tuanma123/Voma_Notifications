@@ -7,10 +7,8 @@ app = Flask(__name__)
 def sms():
     number = request.form['From']
     body = request.form['Body']
-    list = [1,2,3]
     resp = twiml.Response()
-    resp.message("YOU BITCH ASS MOFO")
-    print(body)
+    resp.message(body)
     if body == "add 4" :
         list.append(4)
 
