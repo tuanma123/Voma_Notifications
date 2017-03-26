@@ -112,7 +112,8 @@ class Spammer():
         """
         now = datetime.datetime.now()
         days_left = Timing.days_left_in_month(now.month, now.day, Timing.is_leap_year(now.year))
-        if days_left == 7 and now.hour == hour and now.minute == minute:
+        if days_left == 6 and now.hour == hour and now.minute == minute:
+            print("Entered here")
             for user in Database.get_user_list():
                 if user.rent[now.month-1] == "0":
                     #NOTE: IMPLEMENT AN UTILITY VARIABLE

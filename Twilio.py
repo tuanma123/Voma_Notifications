@@ -1,24 +1,23 @@
 from flask import Flask, request
 from twilio import twiml
-
+import Commands
+import Database
 app = Flask(__name__)
 
-@app.route('/TuansPage/overwatchaccount', methods=['POST'])
+@app.route('/sms', methods=['POST'])
 def sms():
+    print("Before\n")
+    print Database.print_database_by_row()
     number = request.form['From']
     body = request.form['Body']
     resp = twiml.Response()
-    resp.message(body)
-    if body == "add 4" :
-        list.append(4)
-
-    print(list)
-
+    reply = Commands.get_reply_phone(body,number)
+    resp.message(reply)
+    print("After\n")
+    print Database.print_database_by_row()
     return str(resp)
 
-@app.route('/TuansPages')
-def tuans_page():
-    return "Tuan is super cool"
+
 
 if __name__ == '__main__':
     app.run()

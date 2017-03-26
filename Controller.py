@@ -10,10 +10,6 @@ def main():
     print("This application is based on a 24-hour clock.")
     hour = int(raw_input("Please enter the hour you would like to send messages."))
     minute = int(raw_input("Please enter the minute you would like to send messages"))
-    email_list = Database.get_email_list()
-    phone_number_list = Database.get_phone_list()
-    user_list = Database.get_user_list()
-   # count = 0
     while True :
         #if(count == 0) :
         spam.automated_messages(hour,minute)

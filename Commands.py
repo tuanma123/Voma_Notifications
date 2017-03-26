@@ -15,13 +15,13 @@ def get_reply_phone(message_received, phone_number):
     is_member = Database.verify_phone_number(phone_number)
     is_admin = Database.is_admin_phone(phone_number)
     msg = ""
-    if "paid" in command:
+    if "paid" in command.lower():
         Database.update_rent_phone(phone_number)
         msg = "Thank you for your payment"
-    elif "announce" in command:
+    elif "announce" in command.lower():
         msg = "Announcement by " + str(Database.get_name_phone(phone_number)) + "\n" + \
               ' '.join(message_tokens[1:])
-    elif "emailon" in command:
+    elif "emailon" in command.lower():
         Database.update_permissions_email(phone_number)
         msg = "Messaging has been turned on"
     elif "phoneon" in command:
@@ -30,4 +30,5 @@ def get_reply_phone(message_received, phone_number):
         return None
     return msg
 
-print(get_reply_phone("announce Hello world I am testing this new product", ""))
+
+print(get_reply_phone("announce Hello world I am testing this new product", "12065793508"))

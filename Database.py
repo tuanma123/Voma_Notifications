@@ -230,15 +230,17 @@ def update_rent_phone(phone_number) :
     :return: Void
     """
     cursor.execute("SELECT * FROM users WHERE phoneNumber=?", (phone_number,))
-    current_rent = (cursor.fetchone()[5])
-    current_rent_list = list(current_rent)
-    for x in current_rent_list:
-        if x == "0":
-            pos_x = current_rent.index(x)
-            current_rent_list[pos_x] = "1"
-            break
-    new_rent = ''.join(current_rent_list)
-    cursor.execute("UPDATE users SET rent=? WHERE rent=? AND phoneNumber=?", (new_rent, current_rent, phone_number))
+    current_rent = cursor.fetchall()
+    if current_rent :
+        current_rent = current_rent[0][5]
+        current_rent_list = list(current_rent)
+        for x in current_rent_list:
+            if x == "0":
+                pos_x = current_rent.index(x)
+                current_rent_list[pos_x] = "1"
+                break
+        new_rent = ''.join(current_rent_list)
+        cursor.execute("UPDATE users SET rent=? WHERE rent=? AND phoneNumber=?", (new_rent, current_rent, phone_number))
 
 
 def get_name_phone(phone_number) :
