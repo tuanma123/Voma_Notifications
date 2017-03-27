@@ -1,0 +1,5 @@
+email_username = "Enter Email Bot Username here"
+email_password = "Enter Email Bot Password here"
+twilio_id = "Enter Twilio ID here"
+twilio_auth_token = "Enter Twilio Authentification Token here"
+twilio_phone_number = "Enter Twilio Phone Number here"
