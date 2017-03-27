@@ -24,7 +24,7 @@ def construct_token_string(file_string_list, token_map):
     for string_list in file_string_list:
         # If the list is empty, its just a line feed
         if string_list == ['']:
-            result += '\n'
+            result += '\n' * 2
         else:
             # Go through every word of a non empty sentence
             for string in string_list:
