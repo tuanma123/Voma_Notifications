@@ -43,7 +43,6 @@ def insert_user_object(user):
     """
     insert_user(user.first_name, user.last_name, user.email, user.phone_number, user.permissions, user.rent)
 
-
 def insert_user_list(user_list):
     """ Inserts a whole list of users into the database. Iterates through the list of users and calls the insert user
     method.
@@ -268,7 +267,7 @@ def update_email(old_email, new_email):
 # Update users phone number given old and new phone number
 def update_phone_number(old_number, new_number):
     cursor.execute("UPDATE users SET phoneNumber=? WHERE phoneNumber=?", (new_number, old_number))
-
+    connection.commit()
 
 def update_user(old_user, new_user):
     """ Updates the data for a user.
@@ -302,7 +301,7 @@ def update_rent_by_email(email_address):
                 break
         new_rent = ''.join(current_rent_list)
         cursor.execute("UPDATE users SET rent=? WHERE rent=? AND email=?", (new_rent, current_rent,email_address))
-
+        connection.commit()
 
 def update_rent_by_phone(phone_number) :
     """ Updates the persons rent by one given their phone number.
@@ -322,7 +321,7 @@ def update_rent_by_phone(phone_number) :
                 break
         new_rent = ''.join(current_rent_list)
         cursor.execute("UPDATE users SET rent=? WHERE rent=? AND phoneNumber=?", (new_rent, current_rent, phone_number))
-
+        connection.commit()
 
 #  Updates a users permissions and turns on email notifications.
 def update_permissions_email(email):
@@ -335,7 +334,7 @@ def update_permissions_email(email):
         new_permissions = ''.join(indexing)
         cursor.execute("UPDATE users SET permissions=? WHERE permissions=? AND email=?",
                        (new_permissions, permissions, email))
-
+        connection.commit()
 
 # Updates a users permissions and turns on phone notifications.
 def update_permissions_phone(phone_number):
@@ -348,7 +347,7 @@ def update_permissions_phone(phone_number):
         new_permissions = ''.join(indexing)
         cursor.execute("UPDATE users SET permissions=? WHERE permissions=? AND phoneNumber=?",
                        (new_permissions, permissions, phone_number))
-
+        connection.commit()
 
 # Viewing the table_____________________________________________________________________________________________________
 def print_database_by_row():
