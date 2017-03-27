@@ -41,7 +41,8 @@ def get_reply_phone(message_received, phone_number):
     elif "phoneon" in command and is_member:
         Database.update_permissions_phone(phone_number)
         msg = "Phone Notifications has been turned on"
-    elif "history" in command and is_admin:
-        return Database.get_rent_history()
-
+    elif "report" in command and is_member and is_admin:
+        return Database.get_rent_report()
+    elif "history" in command and is_member:
+        return Database.get_rent_history(phone_number)
     return msg

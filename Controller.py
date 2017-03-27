@@ -1,8 +1,4 @@
 from UserInfo import twilio_phone_number, twilio_auth_token, twilio_id, email_username, email_password
-
-
-import Database
-from User import User
 from Spammer import Spammer
 import Timing
 

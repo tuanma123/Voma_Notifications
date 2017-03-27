@@ -180,7 +180,7 @@ def get_email_list():
     return get_user_list()
 
 
-def get_rent_history():
+def get_rent_report():
     rent_list = []
     cursor.execute("SELECT * FROM users")
     for row in cursor.fetchall():
@@ -192,6 +192,14 @@ def get_rent_history():
 
     return format
 
+
+def get_rent_history(phone_number):
+    cursor.execute("SELECT * FROM users WHERE phoneNumber=?", (phone_number,))
+    history = cursor.fetchone()
+    if history:
+        print(history)
+        history = "Rent History for " + str(history[0]) + " " + str(history[1]) + "\n" + str(history[5])
+        return history
 
 def get_phone_list():
     """ Gets a  phone mailing list for ALL of our users.
@@ -250,6 +258,17 @@ def get_name_email(email) :
     else:
         return None
 
+# Updating User Information_____________________________________________________________________________________________
+
+# Update Users email given old and new email.
+def update_email(old_email, new_email):
+    cursor.execute("UPDATE users SET email=? WHERE email=?", (new_email, old_email))
+
+
+# Update users phone number given old and new phone number
+def update_phone_number(old_number, new_number):
+    cursor.execute("UPDATE users SET phoneNumber=? WHERE phoneNumber=?", (new_number, old_number))
+
 
 def update_user(old_user, new_user):
     """ Updates the data for a user.
@@ -263,18 +282,6 @@ def update_user(old_user, new_user):
                    "AND lastName=?",(new_user.first_name, new_user.last_name, new_user.email, new_user.phone_number,
                                      new_user.permissions, new_user.rent, old_user.first_name, old_user.last_name))
     connection.commit()
-
-
-# Updating User Information_____________________________________________________________________________________________
-
-# Update Users email given old and new email.
-def update_email(old_email, new_email):
-    cursor.execute("UPDATE users SET email=? WHERE email=?", (new_email, old_email))
-
-
-# Update users phone number given old and new phone number
-def update_phone_number(old_number, new_number):
-    cursor.execute("UPDATE users SET phoneNumber=? WHERE phoneNumber=?", (new_number, old_number))
 
 
 def update_rent_by_email(email_address):
