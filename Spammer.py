@@ -79,7 +79,6 @@ class Spammer():
 
         body = body
         msg.attach(MIMEText(body, 'plain'))
-
         server = smtplib.SMTP('smtp.gmail.com', 587)
         server.starttls()
         server.login(self.email_address, self.email_password)
@@ -87,6 +86,7 @@ class Spammer():
         server.sendmail(self.email_address, to_address, text)
         server.quit()
         print("message sent")
+
 
     def send_email_to_users(self, subject, body):
         user_list = Database.get_user_list()
@@ -102,6 +102,7 @@ class Spammer():
             self.send_email(user.email,"AUTOMATED MESSAGE", message)
         if user.permissions[1] == "1":
             self.send_text(user.phone_number, message)
+
 
 
     def automated_messages(self, hour, minute):

@@ -121,6 +121,25 @@ def is_admin_phone(phone_number):
         return False
 
 
+def announcement_enabled_email(email):
+    cursor.execute("SELECT * FROM users WHERE email=?", (email,))
+    check = cursor.fetchall()
+    if check:
+        permissions = check[0][4]
+        return permissions[2] == "1"
+    else:
+        return False
+
+
+def announcement_enabled_phone(phone_number):
+    cursor.execute("SELECT * FROM users WHERE phoneNumber=?", (phone_number,))
+    check = cursor.fetchall()
+    if check:
+        permissions = check[0][4]
+        return permissions[2] == "1"
+    else:
+        return False
+
 def get_user(first_name, last_name):
     """
     Prints all users whose first and last name match the parameters.
@@ -159,6 +178,19 @@ def get_email_list():
     for row in cursor.fetchall():
         email_list.append(row[2])
     return get_user_list()
+
+
+def get_rent_history():
+    rent_list = []
+    cursor.execute("SELECT * FROM users")
+    for row in cursor.fetchall():
+        rent_list.append(row[0] + row[1] + ": " + row[5])
+
+    format = ""
+    for string in rent_list:
+        format += string + "\n"
+
+    return format
 
 
 def get_phone_list():
@@ -252,15 +284,17 @@ def update_rent_by_email(email_address):
     :return: Void
     """
     cursor.execute("SELECT * FROM users WHERE email=?", (email_address,))
-    current_rent = (cursor.fetchone()[5])
-    current_rent_list = list(current_rent)
-    for x in current_rent_list :
-        if x == "0":
-            pos_x = current_rent.index(x)
-            current_rent_list[pos_x] = "1"
-            break
-    new_rent = ''.join(current_rent_list)
-    cursor.execute("UPDATE users SET rent=? WHERE rent=? AND email=?", (new_rent, current_rent,email_address))
+    current_rent = cursor.fetchone()
+    if current_rent:
+        current_rent = current_rent[5]
+        current_rent_list = list(current_rent)
+        for x in current_rent_list :
+            if x == "0":
+                pos_x = current_rent.index(x)
+                current_rent_list[pos_x] = "1"
+                break
+        new_rent = ''.join(current_rent_list)
+        cursor.execute("UPDATE users SET rent=? WHERE rent=? AND email=?", (new_rent, current_rent,email_address))
 
 
 def update_rent_by_phone(phone_number) :
@@ -303,7 +337,7 @@ def update_permissions_phone(phone_number):
     if check:
         permissions = check[0][4]
         indexing = list(permissions)
-        indexing[1] = 1
+        indexing[1] = "1"
         new_permissions = ''.join(indexing)
         cursor.execute("UPDATE users SET permissions=? WHERE permissions=? AND phoneNumber=?",
                        (new_permissions, permissions, phone_number))
