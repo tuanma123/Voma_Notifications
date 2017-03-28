@@ -11,6 +11,7 @@ Database.insert_user_object(tuan)
 Database.insert_user_object(tony)
 Database.print_database_by_row()
 Database.connection.commit()
+print(Database.get_name("tonyt.vo22@gmail.com"))
 
 def main():
     spam = Spammer(twilio_id, twilio_auth_token, twilio_phone_number, email_username, email_password)

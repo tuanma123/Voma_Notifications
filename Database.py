@@ -5,6 +5,7 @@ connection = _sqlite3.connect("Master.db")
 connection.text_factory = str
 cursor = connection.cursor()
 
+
 def create_table ():
     """ Creates a table named users
 
@@ -13,9 +14,16 @@ def create_table ():
     cursor.execute("CREATE TABLE IF NOT EXISTS users(firstName TEXT, lastName TEXT, email TEXT, phoneNumber TEXT, "
                    "permissions TEXT, rent TEXT)")
 
+
+# Determine if given information is a type of phone number or email address
+def determine_phone_or_email(string) :
+    if ".com" in string or ".edu" in string:
+        return "email"
+    else:
+        return "phoneNumber"
+
+
 # Inserting Users_______________________________________________________________________________________________________
-
-
 def insert_user(first_name, last_name, email, phone_number, permissions, rent):
     """ Insert a new user into the database based on parameters.
 
@@ -42,6 +50,7 @@ def insert_user_object(user):
     """
     insert_user(user.first_name, user.last_name, user.email, user.phone_number, user.permissions, user.rent)
 
+
 def insert_user_list(user_list):
     """ Inserts a whole list of users into the database. Iterates through the list of users and calls the insert user
     method.
@@ -52,8 +61,8 @@ def insert_user_list(user_list):
     for user in user_list:
         insert_user_object(user)
 
-# Deleting Users________________________________________________________________________________________________________
 
+# Deleting Users________________________________________________________________________________________________________
 def delete_user(first_name, last_name):
     """ Deletes all users who's first name and last name match the parameters.
 
@@ -99,44 +108,15 @@ def verify_email(email):
     return len(result) > 0
 
 
-def is_admin_email(email):
-    cursor.execute("SELECT * FROM users WHERE email=?", (email,))
-    check = cursor.fetchall()
-    if check:
-        permissions = check[0][4]
-        return permissions[4] == "1"
-    else:
-        return False
+def is_admin(information):
+    user = get_user(information)
+    return user.permissions[4] == "1"
 
 
-def is_admin_phone(phone_number):
-    cursor.execute("SELECT * FROM users WHERE phoneNumber=?", (phone_number,))
-    check = cursor.fetchall()
-    if check:
-        permissions = check[0][4]
-        return permissions[4] == "1"
-    else:
-        return False
+def announcement_enabled(information):
+    user = get_user(information)
+    return user.permissions[2] == "1"
 
-
-def announcement_enabled_email(email):
-    cursor.execute("SELECT * FROM users WHERE email=?", (email,))
-    check = cursor.fetchall()
-    if check:
-        permissions = check[0][4]
-        return permissions[2] == "1"
-    else:
-        return False
-
-
-def announcement_enabled_phone(phone_number):
-    cursor.execute("SELECT * FROM users WHERE phoneNumber=?", (phone_number,))
-    check = cursor.fetchall()
-    if check:
-        permissions = check[0][4]
-        return permissions[2] == "1"
-    else:
-        return False
 
 def get_user(first_name, last_name):
     """
@@ -178,15 +158,9 @@ def get_email_list():
     return get_user_list()
 
 
-def get_user_by_email(email):
-    cursor.execute("SELECT * FROM users WHERE email=?", (email,))
-    user_info = cursor.fetchone()
-    if user_info:
-        user = User(user_info[0], user_info[1], user_info[2], user_info[3], user_info[4], user_info[5])
-        return user
-
-def get_user_by_phone(phone_number):
-    cursor.execute("SELECT * FROM users WHERE phoneNumber=?", (phone_number,))
+def get_user(information):
+    location = determine_phone_or_email(information) + "=?"
+    cursor.execute("SELECT * FROM users WHERE " + location, (information,))
     user_info = cursor.fetchone()
     if user_info:
         user = User(user_info[0], user_info[1], user_info[2], user_info[3], user_info[4], user_info[5])
@@ -195,24 +169,21 @@ def get_user_by_phone(phone_number):
 
 def get_rent_report():
     rent_list = []
-    cursor.execute("SELECT * FROM users")
-    for row in cursor.fetchall():
-        rent_list.append(row[0] + " " + row[1] + ": " + row[5])
+    user_list = get_user_list()
+    for user in user_list:
+        rent_list.append(user.first_name + " " + user.last_name + ": " + user.rent)
 
-    format = "\n"
+    user_string = "\n"
     for string in rent_list:
-        format += string + "\n"
+        user_string += string + "\n"
 
-    return format
+    return user_string
 
 
-def get_rent_history(phone_number):
-    cursor.execute("SELECT * FROM users WHERE phoneNumber=?", (phone_number,))
-    history = cursor.fetchone()
-    if history:
-        print(history)
-        history = "\nRent History for " + str(history[0]) + " " + str(history[1]) + "\n" + str(history[5])
-        return history
+def get_rent_history(information):
+    user = get_user(information)
+    return user.rent
+
 
 def get_phone_list():
     """ Gets a  phone mailing list for ALL of our users.
@@ -242,36 +213,12 @@ def get_preference_list():
     return [email_list, phone_list]
 
 
-def get_name_phone(phone_number) :
-    """ Get a user's first and last name based on their phone number.
-    :param phone_number: The user's phone number
-    :return: The name of the person associated with the given phone number. Returns None if not found.
-    """
-    cursor.execute("SELECT * FROM users WHERE phoneNumber=?",(phone_number,))
-    check = cursor.fetchone()
-    if check:
-        first_name = check[0]
-        last_name = check[1]
-        return first_name + " " + last_name
-    else:
-        return None
-
-
-def get_name_email(email) :
-    """ Get a user's first and last name based on their email.
-        :param email: The user's email address.
-        :return: The name of the person associated with the given email. Returns None if not found.
-        """
-    cursor.execute("SELECT * FROM users WHERE email=?",(email,))
-    check = cursor.fetchone()
-    if check:
-        first_name = check[0]
-        last_name = check[1]
-        return first_name + " " + last_name
-    else:
-        return None
+def get_name(information) :
+    user = get_user(information)
+    return user.first_name + " " + user.last_name
 
 # Updating User Information_____________________________________________________________________________________________
+
 
 # Update Users email given old and new email.
 def update_email(old_email, new_email):
@@ -283,6 +230,7 @@ def update_phone_number(old_number, new_number):
     cursor.execute("UPDATE users SET phoneNumber=? WHERE phoneNumber=?", (new_number, old_number))
     connection.commit()
 
+
 def update_user(old_user, new_user):
     """ Updates the data for a user.
 
@@ -290,20 +238,21 @@ def update_user(old_user, new_user):
     :param new_user:  The new user information.
     :return: Void.
     """
-    #cursor.execute("SELECT * FROM users")
     cursor.execute("UPDATE users  SET firstName=?, lastName=?, email=?, phoneNumber=?, permissions=?, rent=? WHERE firstName=? "
                    "AND lastName=?",(new_user.first_name, new_user.last_name, new_user.email, new_user.phone_number,
                                      new_user.permissions, new_user.rent, old_user.first_name, old_user.last_name))
     connection.commit()
 
 
-def update_rent_by_email(email_address):
+def update_rent(information):
     """ Updates the persons rent by one given their email address.
 
-    :param email_address: The user's email address.
+    :param information: The user's email address.
     :return: Void
     """
-    cursor.execute("SELECT * FROM users WHERE email=?", (email_address,))
+    info_type = determine_phone_or_email(information)
+    location = info_type + "=?"
+    cursor.execute("SELECT * FROM users WHERE " + location, (information,))
     current_rent = cursor.fetchone()
     if current_rent:
         current_rent = current_rent[5]
@@ -314,56 +263,39 @@ def update_rent_by_email(email_address):
                 current_rent_list[pos_x] = "1"
                 break
         new_rent = ''.join(current_rent_list)
-        cursor.execute("UPDATE users SET rent=? WHERE rent=? AND email=?", (new_rent, current_rent,email_address))
-        connection.commit()
-
-
-def update_rent_by_phone(phone_number) :
-    """ Updates the persons rent by one given their phone number.
-
-    :param email_address: The user's email address.
-    :return: Void
-    """
-    cursor.execute("SELECT * FROM users WHERE phoneNumber=?", (phone_number,))
-    current_rent = cursor.fetchall()
-    if current_rent :
-        current_rent = current_rent[0][5]
-        current_rent_list = list(current_rent)
-        for x in current_rent_list:
-            if x == "0":
-                pos_x = current_rent.index(x)
-                current_rent_list[pos_x] = "1"
-                break
-        new_rent = ''.join(current_rent_list)
-        cursor.execute("UPDATE users SET rent=? WHERE rent=? AND phoneNumber=?", (new_rent, current_rent, phone_number))
+        cursor.execute("UPDATE users SET rent=? WHERE rent=? AND " + location, (new_rent, current_rent,information))
         connection.commit()
 
 
 #  Updates a users permissions and turns on email notifications.
-def update_permissions_email(phone_number, number):
-    cursor.execute("SELECT * FROM users WHERE phoneNumber=?", (phone_number,))
+def update_email_preference(information, number):
+    info_type = determine_phone_or_email(information)
+    location = info_type + "=?"
+    cursor.execute("SELECT * FROM users WHERE " + location, (information))
     check = cursor.fetchone()
     if check:
         permissions = check[4]
         indexing = list(permissions)
         indexing[0] = str(number)
         new_permissions = ''.join(indexing)
-        cursor.execute("UPDATE users SET permissions=? WHERE permissions=? AND phoneNumber=?",
-                       (new_permissions, permissions, phone_number))
+        cursor.execute("UPDATE users SET permissions=? WHERE permissions=? AND " + location,
+                       (new_permissions, permissions, information))
         connection.commit()
 
 
 # Updates a users permissions and turns on phone notifications.
-def update_permissions_phone(phone_number, number):
-    cursor.execute("SELECT * FROM users WHERE phoneNumber=?", (phone_number,))
+def update_phone_preference(information, number):
+    info_type = determine_phone_or_email(information)
+    location = info_type + "=?"
+    cursor.execute("SELECT * FROM users WHERE " + location, (information,))
     check = cursor.fetchone()
     if check:
         permissions = check[4]
         indexing = list(permissions)
         indexing[1] = str(number)
         new_permissions = ''.join(indexing)
-        cursor.execute("UPDATE users SET permissions=? WHERE permissions=? AND phoneNumber=?",
-                       (new_permissions, permissions, phone_number))
+        cursor.execute("UPDATE users SET permissions=? WHERE permissions=? AND " + location,
+                       (new_permissions, permissions, information))
         connection.commit()
 
 
