@@ -271,7 +271,7 @@ def update_rent(information):
 def update_email_preference(information, number):
     info_type = determine_phone_or_email(information)
     location = info_type + "=?"
-    cursor.execute("SELECT * FROM users WHERE " + location, (information))
+    cursor.execute("SELECT * FROM users WHERE " + location, (information,))
     check = cursor.fetchone()
     if check:
         permissions = check[4]
