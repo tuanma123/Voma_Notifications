@@ -1,6 +1,7 @@
 from flask import Flask, request
 from twilio import twiml
 import Commands
+import sys
 import Database
 app = Flask(__name__)
 
@@ -13,8 +14,10 @@ def sms():
     resp = twiml.Response()
     reply = Commands.get_reply_phone(body,number)
     resp.message(reply)
+
     print("After\n")
     print Database.print_database_by_row()
+    print(str(number))
     return str(resp)
 
 

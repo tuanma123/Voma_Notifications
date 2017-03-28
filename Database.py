@@ -5,7 +5,6 @@ connection = _sqlite3.connect("Master.db")
 connection.text_factory = str
 cursor = connection.cursor()
 
-
 def create_table ():
     """ Creates a table named users
 
@@ -179,13 +178,28 @@ def get_email_list():
     return get_user_list()
 
 
+def get_user_by_email(email):
+    cursor.execute("SELECT * FROM users WHERE email=?", (email,))
+    user_info = cursor.fetchone()
+    if user_info:
+        user = User(user_info[0], user_info[1], user_info[2], user_info[3], user_info[4], user_info[5])
+        return user
+
+def get_user_by_phone(phone_number):
+    cursor.execute("SELECT * FROM users WHERE phoneNumber=?", (phone_number,))
+    user_info = cursor.fetchone()
+    if user_info:
+        user = User(user_info[0], user_info[1], user_info[2], user_info[3], user_info[4], user_info[5])
+        return user
+
+
 def get_rent_report():
     rent_list = []
     cursor.execute("SELECT * FROM users")
     for row in cursor.fetchall():
-        rent_list.append(row[0] + row[1] + ": " + row[5])
+        rent_list.append(row[0] + " " + row[1] + ": " + row[5])
 
-    format = ""
+    format = "\n"
     for string in rent_list:
         format += string + "\n"
 
@@ -197,7 +211,7 @@ def get_rent_history(phone_number):
     history = cursor.fetchone()
     if history:
         print(history)
-        history = "Rent History for " + str(history[0]) + " " + str(history[1]) + "\n" + str(history[5])
+        history = "\nRent History for " + str(history[0]) + " " + str(history[1]) + "\n" + str(history[5])
         return history
 
 def get_phone_list():
@@ -303,6 +317,7 @@ def update_rent_by_email(email_address):
         cursor.execute("UPDATE users SET rent=? WHERE rent=? AND email=?", (new_rent, current_rent,email_address))
         connection.commit()
 
+
 def update_rent_by_phone(phone_number) :
     """ Updates the persons rent by one given their phone number.
 
@@ -323,31 +338,34 @@ def update_rent_by_phone(phone_number) :
         cursor.execute("UPDATE users SET rent=? WHERE rent=? AND phoneNumber=?", (new_rent, current_rent, phone_number))
         connection.commit()
 
-#  Updates a users permissions and turns on email notifications.
-def update_permissions_email(email):
-    cursor.execute("SELECT * FROM users WHERE email=?", (email,))
-    check = cursor.fetchall()
-    if check:
-        permissions = check[0][4]
-        indexing = list(permissions)
-        indexing[0] = "1"
-        new_permissions = ''.join(indexing)
-        cursor.execute("UPDATE users SET permissions=? WHERE permissions=? AND email=?",
-                       (new_permissions, permissions, email))
-        connection.commit()
 
-# Updates a users permissions and turns on phone notifications.
-def update_permissions_phone(phone_number):
+#  Updates a users permissions and turns on email notifications.
+def update_permissions_email(phone_number, number):
     cursor.execute("SELECT * FROM users WHERE phoneNumber=?", (phone_number,))
-    check = cursor.fetchall()
+    check = cursor.fetchone()
     if check:
-        permissions = check[0][4]
+        permissions = check[4]
         indexing = list(permissions)
-        indexing[1] = "1"
+        indexing[0] = str(number)
         new_permissions = ''.join(indexing)
         cursor.execute("UPDATE users SET permissions=? WHERE permissions=? AND phoneNumber=?",
                        (new_permissions, permissions, phone_number))
         connection.commit()
+
+
+# Updates a users permissions and turns on phone notifications.
+def update_permissions_phone(phone_number, number):
+    cursor.execute("SELECT * FROM users WHERE phoneNumber=?", (phone_number,))
+    check = cursor.fetchone()
+    if check:
+        permissions = check[4]
+        indexing = list(permissions)
+        indexing[1] = str(number)
+        new_permissions = ''.join(indexing)
+        cursor.execute("UPDATE users SET permissions=? WHERE permissions=? AND phoneNumber=?",
+                       (new_permissions, permissions, phone_number))
+        connection.commit()
+
 
 # Viewing the table_____________________________________________________________________________________________________
 def print_database_by_row():

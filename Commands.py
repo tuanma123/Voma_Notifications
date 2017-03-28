@@ -35,14 +35,25 @@ def get_reply_phone(message_received, phone_number):
         return "Announcement has been sent"
 
     elif "emailon" in command.lower() and is_member:
-        Database.update_permissions_email(phone_number)
+        Database.update_permissions_email(phone_number, 1)
         msg = "Email Notifications has been turned on"
 
+    elif "emailoff" in command.lower() and is_member:
+        Database.update_permissions_email(phone_number, 0)
+        msg = "Email Notifications has been turned off"
+
     elif "phoneon" in command and is_member:
-        Database.update_permissions_phone(phone_number)
+        Database.update_permissions_phone(phone_number, 1)
         msg = "Phone Notifications has been turned on"
+
+    elif "phoneoff" in command and is_member:
+        Database.update_permissions_phone(phone_number, 0)
+        msg = "Phone Notifications has been turned off"
+
     elif "report" in command and is_member and is_admin:
+        print("Data is: "+ str(Database.get_rent_report()))
         return Database.get_rent_report()
+
     elif "history" in command and is_member:
         return Database.get_rent_history(phone_number)
     return msg
